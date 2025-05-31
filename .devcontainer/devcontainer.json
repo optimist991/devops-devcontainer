@@ -1,0 +1,50 @@
+// devops-devcontainer/.devcontainer/devcontainer.json
+{
+    "name": "Devops AWS Environment",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "args": {
+            "CONTAINER_USER": "devops"
+        }
+    },
+    "containerUser": "devops",
+    "mounts": [
+        "source=devops-home-volume,target=/home/devops,type=volume",
+        "source=${localWorkspaceFolder},target=/host,type=bind,consistency=cached",
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "workspaceMount": "source=devops-volume,target=/devops,type=volume",
+    "workspaceFolder": "/devops",
+    "runArgs": [
+        "--privileged"
+    ],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "bash"
+                    },
+                    "zsh": {
+                        "path": "/usr/bin/zsh" // If you installed zsh in Dockerfile
+                    }
+                },
+                // Other useful VS Code settings
+                "editor.wordWrap": "on",
+                "files.autoSave": "afterDelay"
+            },
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "hashicorp.terraform",
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "redhat.vscode-yaml",
+                "amazonwebservices.aws-vscode-toolkit",
+                "ms-python.python",
+                "pkief.material-icon-theme"
+            ]
+        }
+    },
+    "postCreateCommand": "chmod +x /home/devops", // Ensure home directory is executable
+    "remoteUser": "devops"
+}
