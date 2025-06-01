@@ -2,7 +2,7 @@
 
 This repository provides a pre-configured development environment for AWS DevOps tasks, leveraging VS Code Dev Containers. It includes a base Ubuntu image with essential tools like AWS CLI, Terraform, kubectl, Helm, Docker CLI, Python, and more.
 
-The environment is designed to be fully isolated and reproducible, using Docker volumes for persistent storage of user configurations and project repositories.
+The environment is designed to be fully isolated and reproducible. **The Docker image for this Dev Container is pre-built and hosted on Docker Hub, eliminating the need for local image builds and ensuring consistent environments.**
 
 ---
 
@@ -44,10 +44,9 @@ Follow these steps to get your AWS DevOps Dev Container up and running:
 
 1.  **Clone this Repository**:
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/devops-devcontainer.git](https://github.com/YOUR_USERNAME/devops-devcontainer.git)
+    git@github.com:optimist991/devops-devcontainer.git
     cd devops-devcontainer
     ```
-    (Replace `YOUR_USERNAME` with your actual GitHub username or the repository's URL).
 
 2.  **Create Docker Volumes (Optional but Recommended)**:
     While VS Code Dev Containers can create volumes automatically, it's good practice to create them manually first for clarity and control.
@@ -62,9 +61,9 @@ Follow these steps to get your AWS DevOps Dev Container up and running:
     * VS Code should detect the `.devcontainer` folder and prompt you to "Reopen in Container" (or "Open Folder in Container"). Click this button.
     * If you don't see the prompt, open the Command Palette (Ctrl+Shift+P or F1) and type `Dev Containers: Reopen in Container`.
 
-4.  **Wait for Container Build**:
-    * The first time you open the folder in a container, VS Code will build the Docker image (based on `Dockerfile`) and then start the container. This process can take several minutes as it downloads base images and installs all specified tools.
-    * You'll see progress updates in the VS Code terminal/output panel.
+4.  **Wait for Container Setup**:
+    * The first time you open the folder in a container, VS Code will **pull the pre-built Docker image from Docker Hub**. This process is generally much faster than building locally.
+    * You'll see progress updates as the image is downloaded and the container starts.
 
 5.  **Verify the Environment**:
     Once the container is running and VS Code connects to it, open a new terminal in VS Code (Ctrl+\` or `Terminal` > `New Terminal`). You should be logged in as the `devops` user in the `/devops` directory.
@@ -73,8 +72,8 @@ Follow these steps to get your AWS DevOps Dev Container up and running:
 
     ```bash
     # Check user and current directory
-    whoami                 # Should show 'devops'
-    pwd                    # Should show '/devops'
+    whoami          # Should show 'devops'
+    pwd             # Should show '/devops'
     ls -la /home/devops    # Verify home directory contents (e.g., .bashrc, .venv)
 
     # Check Ubuntu version
@@ -110,6 +109,23 @@ Follow these steps to get your AWS DevOps Dev Container up and running:
 
 ---
 
+## Image Management and Updates
+
+The Docker image for this Dev Container is built and pushed to **Docker Hub** via **GitHub Actions**.
+
+* **Docker Hub Repository**: `optimist991/devcontainer`
+* **Versioning**:
+    * Images are tagged with `latest` (always pointing to the most recent successful build) and an incremental tag like `[GitHub_Run_Number]-[Short_Commit_SHA]` (e.g., `123-abcdef7`).
+* **Automatic Builds**:
+    * The GitHub Actions workflow `build-devcontainer-image.yml` (located in `.github/workflows/`) is configured to automatically build and push a new image to Docker Hub whenever:
+        * Changes are pushed to the `main` branch that affect `Dockerfile` or `.devcontainer/devcontainer.json`.
+        * A Pull Request is opened or updated targeting the `main` branch that affects `Dockerfile` or `.devcontainer/devcontainer.json`.
+* **Manual Builds**: You can also manually trigger the GitHub Action via the "workflow_dispatch" event in the GitHub Actions tab.
+
+When the Dev Container starts in VS Code, it pulls the `latest` image from `optimist991/devcontainer` on Docker Hub, ensuring you always have the most up-to-date environment.
+
+---
+
 ## Persistent Data & Workspaces
 
 * **`devops-home-volume`**: This Docker volume is mounted to `/home/devops` inside the container. It stores all user-specific configurations, SSH keys, shell history, and dotfiles. This ensures your personal settings persist even if you rebuild the container.
@@ -120,7 +136,7 @@ Follow these steps to get your AWS DevOps Dev Container up and running:
 ## Customization
 
 ### Adding / Removing Tools
-To add or remove tools, modify the `Dockerfile` in the root of this repository. After making changes, rebuild the container using `Dev Containers: Rebuild Container` from the VS Code Command Palette.
+To add or remove tools, modify the `Dockerfile` in the root of this repository. Your changes will trigger a new image build on GitHub Actions, which will then be available on Docker Hub for your Dev Container.
 
 ### VS Code Extensions
 To modify the list of recommended VS Code extensions, edit the `extensions` array in `.devcontainer/devcontainer.json`.
@@ -131,7 +147,7 @@ To modify the list of recommended VS Code extensions, edit the `extensions` arra
 
 The core components of this Dev Container setup (`Dockerfile` and Docker volumes) are **portable** and can be used with other IDEs that support Docker-based remote development, such as JetBrains products (GoLand, IntelliJ IDEA Ultimate, PyCharm Professional).
 
-While `devcontainer.json` is specific to VS Code, JetBrains IDEs use their own mechanisms (like **JetBrains Gateway** and direct Docker integration) to connect to containers. You would point your JetBrains IDE to the Docker image built from this `Dockerfile` and configure the volume mounts directly within the IDE's remote development setup. The underlying environment and persistence remain the same.
+While `devcontainer.json` is specific to VS Code, JetBrains IDEs use their own mechanisms (like **JetBrains Gateway** and direct Docker integration) to connect to containers. You would point your JetBrains IDE to the Docker image `optimist991/devcontainer:latest` (or a specific version tag) and configure the volume mounts directly within the IDE's remote development setup. The underlying environment and persistence remain the same.
 
 ---
 
