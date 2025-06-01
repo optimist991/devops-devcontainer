@@ -1,0 +1,66 @@
+# devops-devcontainer/.github/workflows/build-devcontainer-image.yml
+name: Build and Push DevContainer Image
+
+on:
+  push:
+    branches:
+      - main 
+    paths:
+      - 'Dockerfile'
+      - '.devcontainer/devcontainer.json'
+  pull_request: 
+    branches:
+      - main 
+    paths:
+      - 'Dockerfile'
+      - '.devcontainer/devcontainer.json'
+  workflow_dispatch: 
+
+env:
+  DOCKER_IMAGE_NAME: optimist991/devcontainer 
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get commit SHA for versioning
+        id: sha
+        run: echo "SHA_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up incremental version name
+        id: image_tag
+        run: |
+          # Use GITHUB_RUN_NUMBER for a simple incremental version
+          # Note: For PRs, github.run_number is unique per workflow run,
+          # and github.sha will correspond to the merge commit SHA.
+          IMAGE_TAG="${{ env.DOCKER_IMAGE_NAME }}:${{ github.run_number }}-${{ steps.sha.outputs.SHA_TAG }}"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG_LATEST=${{ env.DOCKER_IMAGE_NAME }}:latest" >> "$GITHUB_ENV"
+          echo "Generated image tag: $IMAGE_TAG"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_TAG_LATEST }}
+          build-args: |
+            CONTAINER_USER=devops
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

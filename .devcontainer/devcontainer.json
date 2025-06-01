@@ -1,12 +1,7 @@
 // devops-devcontainer/.devcontainer/devcontainer.json
 {
     "name": "Devops AWS Environment",
-    "build": {
-        "dockerfile": "../Dockerfile",
-        "args": {
-            "CONTAINER_USER": "devops"
-        }
-    },
+    "image": "optimist991/devcontainer:latest", // <-- CHANGED: Now pulls from Docker Hub
     "containerUser": "devops",
     "mounts": [
         "source=devops-home-volume,target=/home/devops,type=volume",

@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
+    zsh \
     gnupg \
     lsb-release \
     software-properties-common \
@@ -93,9 +94,3 @@ RUN python3 -m venv ~/.venv \
 # Install Python packages into the virtual environment
 # Important: pip install must be run within the activated venv
 RUN /bin/bash -c "source ~/.venv/bin/activate && pip install --no-cache-dir boto3 botocore aws-requests-auth"
-
-# ... (Optional NVM/Node.js or Zsh/Oh My Zsh installations, if you need them)
-# If you installed Zsh
-# RUN sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-# && chown -R $CONTAINER_USER:$CONTAINER_USER /home/$CONTAINER_USER/.oh-my-zsh
-# ENTRYPOINT ["/usr/bin/zsh"] # If you want to use zsh
