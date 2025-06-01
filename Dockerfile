@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     nano \
     vim \
-    vi \
     software-properties-common \
     apt-transport-https \
     ca-certificates \
