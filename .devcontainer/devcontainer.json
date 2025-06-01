@@ -1,7 +1,7 @@
 // devops-devcontainer/.devcontainer/devcontainer.json
 {
     "name": "Devops AWS Environment",
-    "image": "optimist991/devcontainer:latest", // <-- CHANGED: Now pulls from Docker Hub
+    "image": "optimist991/devcontainer:latest",
     "containerUser": "devops",
     "mounts": [
         "source=devops-home-volume,target=/home/devops,type=volume",
@@ -22,10 +22,9 @@
                         "path": "bash"
                     },
                     "zsh": {
-                        "path": "/usr/bin/zsh" // If you installed zsh in Dockerfile
+                        "path": "/usr/bin/zsh"
                     }
                 },
-                // Other useful VS Code settings
                 "editor.wordWrap": "on",
                 "files.autoSave": "afterDelay"
             },
@@ -40,6 +39,6 @@
             ]
         }
     },
-    "postCreateCommand": "chmod +x /home/devops", // Ensure home directory is executable
+    "postCreateCommand": "chmod +x /home/devops",
     "remoteUser": "devops"
 }

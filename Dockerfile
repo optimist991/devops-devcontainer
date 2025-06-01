@@ -1,6 +1,5 @@
 # devops-devcontainer/Dockerfile
 
-# Base image: Ubuntu (you can choose a specific version, e.g., ubuntu:22.04)
 FROM ubuntu:latest
 
 # Set the user under which the container will operate
@@ -19,6 +18,9 @@ RUN apt-get update && apt-get install -y \
     zsh \
     gnupg \
     lsb-release \
+    nano \
+    vim \
+    vi \
     software-properties-common \
     apt-transport-https \
     ca-certificates \
